@@ -1,11 +1,13 @@
 package com.sunil.albertsonsusers.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
@@ -22,7 +24,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -68,25 +72,55 @@ fun HomeScreen(navController: NavController) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
+                    val context = LocalContext.current
                     Spacer(modifier = Modifier.height(40.dp))
                     Text(
                         text = "Welcome",
                         modifier = Modifier.padding(30.dp),
-                        fontSize = 36.sp)
+                        fontSize = 36.sp
+                    )
                     OutlinedTextField(
                         value = inputUser.value,
-                        onValueChange = {inputUser.value = it},
+                        onValueChange = {newValue ->
+                           // inputUser.value = it
+
+                            if (newValue.all { it.isDigit() && it in '0'..'9' }) {
+                                inputUser.value = newValue
+                            } else { }
+                        },
                         singleLine = true,
                         label = { Text(text = "Enter Number of Users") },
-                        leadingIcon = { Icon(Icons.Default.Person, contentDescription = "" ) },
+                        leadingIcon = { Icon(Icons.Default.Person, contentDescription = "") },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(20.dp, 10.dp, 20.dp, 10.dp,)
+                            .padding(20.dp, 10.dp, 20.dp, 10.dp),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
                     Spacer(modifier = Modifier.height(20.dp))
-                    Button(onClick = {
-                        navController.navigate("Users/${inputUser.value}")
-                    },
+                    Button(
+                        onClick = {
+
+                            if (inputUser.value.isEmpty()) {
+                                Toast.makeText(
+                                    context,
+                                    "please enter some number",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                return@Button
+                            }
+                            val input = inputUser.value.toInt()
+                            if (input != null) {
+                                if (input <= 0) {
+                                    Toast.makeText(
+                                        context,
+                                        "please enter number greter then 0",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    return@Button
+                                }
+                            }
+                            navController.navigate("Users/${input}")
+                        },
                         content = { Text(text = "Submit", fontSize = 20.sp) },
                         modifier = Modifier
                             .fillMaxWidth()
